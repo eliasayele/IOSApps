@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import FirebaseAuth
 class RegisterViewController: UIViewController,UINavigationControllerDelegate {
 
     private let scrollView: UIScrollView = {
@@ -165,6 +165,16 @@ class RegisterViewController: UIViewController,UINavigationControllerDelegate {
               password.count >= 6 else {
             alertUserLoginError()
             return
+        }
+        
+        //Firebae login
+        FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) { result, error in
+            guard let result = result, error == nil else {
+                return
+            }
+            let user = result.user
+            print("Created user \(user)")
+            
         }
     }
     //MARK: Alert

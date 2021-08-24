@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class LoginViewController: UIViewController {
     private let scrollView: UIScrollView = {
@@ -108,6 +109,16 @@ class LoginViewController: UIViewController {
             alertUserLoginError()
             return
         }
+        //firebase login
+        
+        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { authresult, error in
+            guard let result = authresult, error == nil else {
+                print("Failed to login user and email \(email)")
+                return
+            }
+            print("login in user:  \(result.user)")
+            
+        }
     }
     //MARK: Alert
     func alertUserLoginError() {
@@ -122,16 +133,7 @@ class LoginViewController: UIViewController {
         
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+ 
 
 }
 
