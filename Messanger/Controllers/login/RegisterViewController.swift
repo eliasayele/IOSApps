@@ -7,7 +7,7 @@
 
 import UIKit
 
-class RegisterViewController: UIViewController {
+class RegisterViewController: UIViewController,UINavigationControllerDelegate {
 
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -91,6 +91,9 @@ class RegisterViewController: UIViewController {
         imageView.image = UIImage(systemName: "person")
         imageView.tintColor = .gray
         imageView.contentMode = .scaleAspectFit
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 2
+        imageView.layer.borderColor = UIColor.lightGray.cgColor
         return imageView
     }()
     
@@ -105,7 +108,7 @@ class RegisterViewController: UIViewController {
        
         // when user types password field it calls login button
         //when the user finshes type email it calls activate passoword field
-        emailField.delegate = self
+       // emailField.delegate = self
         passwordField.delegate = self
         
         // Add subview first scrollview then other elements to scrollview
@@ -121,14 +124,15 @@ class RegisterViewController: UIViewController {
         gusture.numberOfTouchesRequired = 1
         gusture.numberOfTapsRequired = 1
         imageView.addGestureRecognizer(gusture)
-        
         imageView.isUserInteractionEnabled = true
         scrollView.isUserInteractionEnabled = true
+        
         
         // Do any additional setup after loading the view.
     } 
     @objc private func didTapChangeProfilepic(){
-        print("change pics called")
+        presentPhotoActionSheet()
+        
         
     }
     //MARK: view did layout subview
@@ -137,6 +141,7 @@ class RegisterViewController: UIViewController {
         scrollView.frame = view.bounds
         let size = view.width / 3
         imageView.frame = CGRect(x: (scrollView.width -  size) / 2, y: 20 , width: size, height: size)
+        imageView.layer.cornerRadius = imageView.width / 2.0
         firstNameField.frame = CGRect(x: 30 , y: imageView.bottom + 10 , width: scrollView.width - 60, height: 52)
         lastNameField.frame = CGRect(x: 30 , y: firstNameField.bottom + 10 , width: scrollView.width - 60, height: 52)
         emailField.frame = CGRect(x: 30 , y: lastNameField.bottom + 10 , width: scrollView.width - 60, height: 52)
@@ -147,7 +152,7 @@ class RegisterViewController: UIViewController {
     }
     //MARK: login butun tapped
     @objc private func registerButtonTapped(){
-        emailField.resignFirstResponder()
+       // emailField.resignFirstResponder()
         passwordField.resignFirstResponder()
         guard let firstName = firstNameField.text,
               let lastName = lastNameField.text,
@@ -193,3 +198,44 @@ extension RegisterViewController: UITextFieldDelegate {
     }
 }
 
+extension RegisterViewController: UIImagePickerControllerDelegate {
+    func presentPhotoActionSheet(){
+        let actionSheet = UIAlertController(title: "Profile Picture", message: "how would you like to select a picture?", preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(  UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.addAction(  UIAlertAction(title: "Take Photo", style: .default, handler: {
+            [weak self] _ in  self?.presentCamera()
+        }))
+        actionSheet.addAction(  UIAlertAction(title: "Choose Photo ", style: .default, handler: {
+            [weak self]  _ in self?.presentPhotoPicker()
+        }))
+        present(actionSheet, animated: true)
+    }
+    func presentCamera(){
+     let vc = UIImagePickerController()
+        vc.sourceType = .camera
+        vc.delegate = self
+        vc.allowsEditing  = true
+        present(vc, animated: true)
+    }
+    
+    func presentPhotoPicker(){
+        let vc = UIImagePickerController()
+        vc.sourceType = .photoLibrary
+              vc.delegate = self
+              vc.allowsEditing  = true
+              present(vc, animated: true)
+    }
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        picker.dismiss(animated: true, completion: nil)
+        guard  let selectedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else{
+            return
+        }
+        self.imageView.image = selectedImage
+            print(info)
+    }
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+}
