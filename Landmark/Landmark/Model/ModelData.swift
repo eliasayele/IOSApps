@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Combine
+//import Combine
 final class ModelData: ObservableObject {
    @Published var landmarks: [LandMark] = load("landmarkData.json")
     var hikes : [Hike]  = load("hikeData.json")
